@@ -1,0 +1,19 @@
+{
+  "name": "voxel-backup",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "duplex-emitter": "~2.1.2",
+    "extend": "~1.2.1",
+    "level": "~0.16.0",
+    "voxel-level": "~2.1.0",
+    "websocket-stream": "~0.3.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node demo.js"
+  },
+  "author": "kumavis",
+  "license": "BSD-2-Clause"
+}
