@@ -1,4 +1,27 @@
-var backup = require('./index.js')
+# voxel-backup
+Connect to a voxel-server and store the world chunks in level db
+
+### get in
+on npm
+```javascript
+npm install voxel-backup
+```
+
+### defaults
+```javascript
+var defaults = {
+  worldName: 'world',
+  server: 'ws://localhost:8000/',
+}
+```
+if you dont specify a dbPath you'll get
+```
+opts.dbPath = __dirname+'/dump/'+opts.worldName
+```
+
+### example
+```javascript
+var backup = require('voxel-backup')
 
 var options = {
   worldName: 'kumavis',
@@ -28,3 +51,4 @@ backupper.on('chunk',function(encoded, chunk) {
 backupper.on('id', function(id) {
   console.log('got id', id)
 })
+```
