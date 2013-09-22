@@ -1,7 +1,7 @@
 # voxel-backup
 Connect to a voxel-server and store the world chunks in level db
 
-### get in
+### get it
 on npm
 ```javascript
 npm install voxel-backup
@@ -29,6 +29,8 @@ var options = {
 }
 
 var backupper = backup(options, backupComplete, chunkComplete)
+
+// ----- everything below this is optional -----
 
 console.log('Using database "'+backupper.opts.dbPath+'"')
 console.log('Using server "'+backupper.opts.server+'"')
