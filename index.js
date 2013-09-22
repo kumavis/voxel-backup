@@ -1,13 +1,20 @@
+// external deps
+var async = require('async')
 var level = require('level')
-var voxelLevel = require('voxel-level')
+var sublevel = require('level-sublevel')
 var extend = require('extend')
 var duplexEmitter = require('duplex-emitter')
 var websocket = require('websocket-stream')
 
-// module globals
-module.exports = initialize
+// voxel deps
+var voxelLevel = require('voxel-level')
+var crunch = require('voxel-crunch')
 
-function initialize(opts) {
+// module globals
+module.exports = backup
+
+function backup(opts) {
+  // options and defaults
   var defaults = {
     worldName: 'world',
     server: 'ws://localhost:8000/',
@@ -18,28 +25,62 @@ function initialize(opts) {
   console.log('Using database "'+opts.dbPath+'"')
   console.log('Using server "'+opts.server+'"')
 
-  var voxelDB = voxelLevel(level(opts.dbPath))
+  // prepare fancy db
+  var voxelDB = voxelLevel(sublevel(level(opts.dbPath)))
+  // prepare server
   var server = opts.server
   var socket = websocket(server)
   var emitter = duplexEmitter(socket)
-  console.log('emitter initialized')  
-
-  emitter.on('id', function(id) {
-    console.log('got id', id)
-    emitter.emit('clientSettings', null)
+  // prepare db queue
+  var noMoreChunks = false
+  var dbQueue = async.queue(saveChunk,8)
+  dbQueue.drain = checkComplete
+  
+  // prepare for the worst
+  emitter.on('error', function() {
+    console.log(arguments)
   })
 
+  // say hello
+  emitter.on('id', function(id) {
+    console.log('got id', id)
+  })
+
+  // request the chunks
   emitter.on('settings', function(settings) {
     emitter.emit('created')
     emitter.on('chunk', function(encoded, chunk) {
       console.log( 'getting chunk: '+chunk.position.join('|') )
-      var voxels = crunch.decode(encoded, chunk.length)
+      var voxels = crunch.decode(encoded, new Uint32Array(chunk.length))
       chunk.voxels = voxels
-      voxelDB.store(opts.worldName, chunk, function(err, length) {
-        if (err) throw err
-        console.log( 'saved: '+chunk.position.join('|') )
-      })
+      dbQueue.push({worldName: opts.worldName, chunk: chunk})
     })
   })
+  
+  // no more incomming chunks
+  emitter.on('noMoreChunks',function() {
+    noMoreChunks = true
+    checkComplete()
+  })
+
+  // write a chunk to the db
+  function saveChunk(task, complete) {
+    voxelDB.store(task.worldName, task.chunk, function(err, length) {
+      if (err) throw err
+      console.log( 'saved: '+task.chunk.position.join('|') )
+      complete()
+    })
+  }
+
+  // see if we're all done getting chunks and doing i/o
+  function checkComplete() {
+    if (noMoreChunks && dbQueue.length()===0) {
+      // just in case
+      setTimeout(function(){
+        console.log('-- backup complete --')
+        process.exit()
+      },100)
+    }
+  }
 
 }
