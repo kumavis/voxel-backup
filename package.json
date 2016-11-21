@@ -4,14 +4,14 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "duplex-emitter": "~0.1.10",
-    "extend": "~1.2.1",
-    "level": "~0.16.0",
+    "duplex-emitter": "~2.1.2",
+    "extend": "~3.0.0",
+    "level": "~1.5.0",
     "voxel-level": "~2.1.0",
-    "websocket-stream": "~0.3.2",
+    "websocket-stream": "~3.3.3",
     "voxel-crunch": "~0.2.1",
-    "level-sublevel": "~5.1.1",
-    "async": "~0.2.9"
+    "level-sublevel": "~6.6.1",
+    "async": "~2.1.2"
   },
   "devDependencies": {},
   "scripts": {
