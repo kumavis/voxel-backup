@@ -1,4 +1,6 @@
 # voxel-backup
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/kumavis/voxel-backup.svg)](https://greenkeeper.io/)
 Connect to a voxel-server and store the world chunks in level db
 
 ### get it
